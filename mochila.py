@@ -1,7 +1,8 @@
 from collections import deque
 
 class Item:
-    def __init__(self, peso, valor):
+    def __init__(self, nome, peso, valor):
+        self.nome = nome
         self.peso = peso
         self.valor = valor
 
@@ -17,19 +18,22 @@ def comp(a):
 def maxV(n, b, arr, t):
     carga=0
     valor=0
+    sol=[]
     inteira=True
     for i in n.inc:
         carga+=arr[i].peso
         valor+=arr[i].valor
+        sol.append(arr[i].nome)
 
     if(carga>b):
-        return (0,True,0)
+        return (0,True,0, sol)
 
     j=0
     while j<t and carga+arr[j].peso<=b:
         if(not(j in n.inc) and not(j in n.ex)):
             carga+=arr[j].peso
             valor+=arr[j].valor
+            sol.append(arr[j].nome)
 
         j+=1
 
@@ -44,10 +48,11 @@ def maxV(n, b, arr, t):
 
         j+=1
 
-    return (valor, inteira, j)
+    return (valor, inteira, j, sol)
 
 def mochila(b, arr, t):
     melhor=0
+    bestSol=[]
     arr = sorted(arr, key=comp, reverse= True)
     fila=deque([])
     u=No(0,[],[])
@@ -59,13 +64,14 @@ def mochila(b, arr, t):
             fila.popleft()
             continue
 
-        val, inteira, k=maxV(u, b, arr, t)
+        val, inteira, k, sol=maxV(u, b, arr, t)
 
         if(val<=melhor):
             fila.popleft()
             continue
         elif(inteira):
             melhor=val
+            bestSol=sol.copy()
         else:
             lInc=u.inc.copy()
             rEx=u.ex.copy()
@@ -79,13 +85,15 @@ def mochila(b, arr, t):
         fila.popleft()
 
 
-    return melhor
+    return (melhor, bestSol)
 
 if __name__ == '__main__':
     b = 10
-    arr = [Item(2, 40), Item(3.14, 50), Item(1.98, 100), Item(5, 95), Item(3, 30)]
+    arr = [Item("A",2, 40), Item("B", 3.14, 50), Item("C", 1.98, 100), Item("D", 5, 95), Item("E", 3, 30)]
     t = len(arr)
-    print(mochila(b, arr, t))
+    valor, sol=mochila(b, arr, t)
+    sol=sorted(sol)
+    print(valor, sol)
 
 
 
